@@ -183,6 +183,9 @@ static int expr()
         return variable();
 
 
+    case '0':
+        return digit();
+
 	case '1':
         return digit();
 
