@@ -69,13 +69,13 @@ void PrintInstructionList(FILE * outfile, Instruction * instr)
 		ERROR("No instructions\n");
 		exit(EXIT_FAILURE);
 	}
-	/*
+	
 	Instruction * iterator = instr;
 	while (iterator != NULL){
 		PrintInstruction(outfile, iterator);
 		iterator = iterator->next;
 	}
-	*/
+	
 }
 
 Instruction *ReadInstruction(FILE * infile)
