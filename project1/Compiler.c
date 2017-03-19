@@ -91,7 +91,7 @@ static int digit()
 		exit(EXIT_FAILURE);
 	}
 	reg = next_register();
-	CodeGen(LOADI, to_digit(token), reg, EMPTY_FIELD );
+	CodeGen(LOADI, to_digit(token), reg, EMPTY_FIELD);
 	next_token();
 	return reg;
 }
@@ -124,7 +124,8 @@ static int expr()
 		CodeGen(ADD, left_reg, right_reg, reg);
 		return reg;
 
-	case '-':
+
+    case '-':
 		next_token();
 		left_reg = expr();
 		right_reg = expr();
@@ -137,7 +138,7 @@ static int expr()
 		left_reg = expr();
 		right_reg = expr();
 		reg = next_register();
-		CodeGen(MULT, left_reg, right_reg, reg);
+		CodeGen(MUL, left_reg, right_reg, reg);
 		return reg;
 
 	case '%':
@@ -217,47 +218,65 @@ static int expr()
 
 static void assign()
 {
-	int reg, left_reg, right_reg;
-	left_reg = variable();
+	int right_reg;
+	char temp = token;
+	next_token();
 	if (token != '='){
 		ERROR("Incorrect Token\n");
 		exit(EXIT_FAILURE);
 	}
+	next_token();
 	right_reg = expr();
+	CodeGen(STOREAI, right_reg, 0, (temp-'a')*4);
+}
 
 static void print()
 {
-	/* YOUR CODE GOES HERE */
+	
+	if (token != '#'){
+		ERROR("Incorrect Token\n");
+		exit(EXIT_FAILURE);
+	}
+	next_token();
+	
+
+	CodeGen(OUTPUTAI, 0, (token-'a')*4 , EMPTY_FIELD);
 }
 
 static void stmt()
 {
-	/* YOUR CODE GOES HERE */
+	
+	if (token == '#'){
+		//next_token();
+		print();
+	}
+	else 
+		assign();
+	
 }
 
 static void morestmts()
 {
-	/* YOUR CODE GOES HERE */
+	if (token == ';'){
+		next_token();
+		stmtlist();
+	}
+
+		
+	
 }
 
 static void stmtlist()
 {
-	/* YOUR CODE GOES HERE */
+	stmt();
+	morestmts();
 }
 
 static void program()
 {
-	/* YOUR CODE GOES HERE */
-
-        /* THIS CODE IS BOGUS */
-        int dummy;
-        /* THIS CODE IS BOGUS */
-	dummy = expr();
-
-	if (token != '.') {
-	  ERROR("Program error.  Current input symbol is %c\n", token);
-	  exit(EXIT_FAILURE);
-	};
+	
+	stmtlist();
+	
 }
 
 /*************************************************************************/
