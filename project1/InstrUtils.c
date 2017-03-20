@@ -72,10 +72,12 @@ void PrintInstructionList(FILE * outfile, Instruction * instr)
 	int i = 1;
 	Instruction * iterator = instr;
 	while (iterator != NULL){
-		printf("Critical Flag (inst = %d)  == %c", i, iterator->critical);
 		//PrintInstruction(outfile, iterator);
-		iterator = iterator->next;
+		
+		fprintf(outfile, "Critical Flag (inst = %d) ---  %c\n", i, iterator->critical);
 		i++;
+		
+		iterator = iterator->next;
 	}
 	
 }

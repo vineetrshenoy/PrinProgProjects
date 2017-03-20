@@ -79,7 +79,7 @@ void getNextCritical(Instruction * instr, int reg){
 	//If the instruction is one of the four arithmetic operations
 	if (code == ADD || code == SUB || code == MUL || code == DIV){
 		if (reg == instr->field3){
-			instr->critical = 1;
+			instr->critical = 'a';
 			getNextCritical(instr->prev, instr->field1);
 			getNextCritical(instr->prev, instr->field2);
 
@@ -88,18 +88,18 @@ void getNextCritical(Instruction * instr, int reg){
 
 	//If instruction is a LOADI and register match, mark as critical and return immediately
 	else if (code == LOADI && reg == instr->field2){
-		instr->critical = 1;
+		instr->critical = 'a';
 		return;
 	}
 
 	//code == LOADAI and registers match, the find the instruction of the first register
 	else if (code == LOADAI && reg == instr->field3){
-		instr->critical = 1;
+		instr->critical = 'a';
 		getNextCritical(instr->prev, instr->field1);
 	}
 	//STOREAI
 	else if (code == STOREAI && reg == instr->field2){
-		instr->critical = 1;
+		instr->critical = 'a';
 		getNextCritical(instr->prev, instr->field1);
 	}
 
@@ -110,9 +110,9 @@ void getNextCritical(Instruction * instr, int reg){
 int main()
 {
 	int outputNum = 0;
-	Instruction *head;
-
+	Instruction *head, *temp;
 	head = ReadInstructionList(stdin);
+	temp = head;
 	if (!head) {
 		WARNING("No instructions\n");
 		exit(EXIT_FAILURE);
@@ -120,10 +120,17 @@ int main()
 
 	/* YOUR CODE GOES HERE */
 	//int instructionCount = countInstructions(head);
-	
+	/*
 	outputNum = getOutputInstructions(head);
 	Instruction * val = findStoreInstr(outputInstr[0]);
 	getNextCritical(val->prev, val->field1);
+	*/
+	while (temp != NULL){
+		temp->critical = 'a';
+		temp = temp->next;
+	}
+
+
 	if (head) 
 		PrintInstructionList(stdout, head);
 	
