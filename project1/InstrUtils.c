@@ -69,14 +69,14 @@ void PrintInstructionList(FILE * outfile, Instruction * instr)
 		ERROR("No instructions\n");
 		exit(EXIT_FAILURE);
 	}
-	int i = 1;
+	//int i = 1;
 	Instruction * iterator = instr;
 	while (iterator != NULL){
-		//PrintInstruction(outfile, iterator);
-		
+		PrintInstruction(outfile, iterator);
+		/*
 		fprintf(outfile, "Critical Flag (inst = %d) ---  %c\n", i, iterator->critical);
 		i++;
-		
+		*/
 		iterator = iterator->next;
 	}
 	

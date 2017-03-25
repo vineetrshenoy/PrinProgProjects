@@ -44,6 +44,7 @@ int getOutputInstructions(Instruction * head){
 		
 		if(head->opcode == OUTPUTAI){
 			outputInstr[i] = head;
+			head->critical = '1';
 			i++;
 		}
 		head = head->next;
@@ -61,8 +62,10 @@ Instruction * findStoreInstr(Instruction * instr ){
 	offset = instr->field2;
 	instr = instr->prev;
 	while (instr != NULL){
-		if (instr->opcode == STOREAI && instr->field2 == reg && instr->field3 == offset)
+		if (instr->opcode == STOREAI && instr->field2 == reg && instr->field3 == offset){
+			instr->critical = '1';
 			return instr;
+		}
 		instr = instr->prev;
 	}
 
@@ -77,39 +80,83 @@ void getNextCritical(Instruction * instr, int reg){
 	}
 	code = instr->opcode;
 	//If the instruction is one of the four arithmetic operations
-	if (code == ADD || code == SUB || code == MUL || code == DIV){
-		if (reg == instr->field3){
-			instr->critical = 'a';
+	if ((code == ADD || code == SUB || code == MUL || code == DIV) && (reg == instr->field3)){
+			instr->critical = '1';
 			getNextCritical(instr->prev, instr->field1);
 			getNextCritical(instr->prev, instr->field2);
 
-		}
+		
 	}
 
 	//If instruction is a LOADI and register match, mark as critical and return immediately
 	else if (code == LOADI && reg == instr->field2){
-		instr->critical = 'a';
+		instr->critical = '1';
 		return;
 	}
 
 	//code == LOADAI and registers match, the find the instruction of the first register
 	else if (code == LOADAI && reg == instr->field3){
-		instr->critical = 'a';
-		getNextCritical(instr->prev, instr->field1);
+		instr->critical = '1';
+		Instruction * store = findStoreInstr(instr);
+		getNextCritical(store->prev, store->field1);
 	}
 	//STOREAI
+	
 	else if (code == STOREAI && reg == instr->field2){
-		instr->critical = 'a';
+		instr->critical = '1';
 		getNextCritical(instr->prev, instr->field1);
 	}
-
+	
 	else 
 		getNextCritical(instr->prev, reg);
 }
 
+void preserveCritical(Instruction * head){
+
+	if (head == NULL)
+		return;
+
+	Instruction * previous = head;
+	Instruction * current = head->next;
+	Instruction * last;
+
+	while (current != NULL){
+
+		if (previous->critical == '1' && current->critical == '0'){
+
+			while (current != NULL && current->critical == '0'){
+				
+				if (current->next == NULL)
+					last = current;
+
+				current = current->next;
+
+				if (current != NULL)
+					free(current->prev);
+			}
+
+			if (current == NULL)
+				free(last);
+			
+			else
+				current->prev = previous;
+			
+			previous->next = current;
+
+		}
+
+		previous = current;
+		current = current->next;
+	}
+}
+
+
+
+
 int main()
 {
 	int outputNum = 0;
+	int i = 0;
 	Instruction *head, *temp;
 	head = ReadInstructionList(stdin);
 	temp = head;
@@ -117,18 +164,26 @@ int main()
 		WARNING("No instructions\n");
 		exit(EXIT_FAILURE);
 	}
-
-	/* YOUR CODE GOES HERE */
-	//int instructionCount = countInstructions(head);
-	/*
-	outputNum = getOutputInstructions(head);
-	Instruction * val = findStoreInstr(outputInstr[0]);
-	getNextCritical(val->prev, val->field1);
-	*/
 	while (temp != NULL){
-		temp->critical = 'a';
+		temp->critical = '0';
 		temp = temp->next;
 	}
+	head->critical = '1'; //the first instruction is  always critical
+	/* YOUR CODE GOES HERE */
+	//int instructionCount = countInstructions(head);
+	
+	outputNum = getOutputInstructions(head);
+	for (i = 0; i < outputNum; i++){
+		Instruction * val = findStoreInstr(outputInstr[i]);
+		getNextCritical(val->prev, val->field1);
+	}
+	
+
+	preserveCritical(head);
+
+	
+	free(outputInstr);
+		
 
 
 	if (head) 
