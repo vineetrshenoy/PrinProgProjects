@@ -73,13 +73,13 @@ void PrintInstructionList(FILE * outfile, Instruction * instr)
 	Instruction * iterator = instr;
 	while (iterator != NULL){
 		PrintInstruction(outfile, iterator);
+		iterator = iterator->next;
 		/*
 		fprintf(outfile, "Critical Flag (inst = %d) ---  %c\n", i, iterator->critical);
 		i++;
 		*/
-		iterator = iterator->next;
 	}
-	
+		
 }
 
 Instruction *ReadInstruction(FILE * infile)

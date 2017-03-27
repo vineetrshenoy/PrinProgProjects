@@ -196,18 +196,19 @@ int main()
 	
 	free(outputInstr);
 		
-	Instruction * previous = head;
+	
 
 	if (head) 
 		PrintInstructionList(stdout, head);
 
+	Instruction * previous = head;
 	Instruction * current = head->next;
 	while (current != NULL){
 		free(previous);
 		previous = current;
 		current = current->next;
 	}
-	
+	free(previous);
 	return EXIT_SUCCESS;
 }
 
