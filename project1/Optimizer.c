@@ -113,8 +113,10 @@ void getNextCritical(Instruction * instr, int reg){
 
 void preserveCritical(Instruction * head){
 
-	if (head == NULL)
+	if (head == NULL){
+		printf("No instruction list\n");
 		return;
+	}
 
 	Instruction * previous = head;
 	Instruction * current = head->next;
@@ -135,8 +137,9 @@ void preserveCritical(Instruction * head){
 					free(current->prev);
 			}
 
-			if (current == NULL)
+			if (current == NULL){
 				free(last);
+			}
 			
 			else
 				current->prev = previous;
@@ -146,7 +149,10 @@ void preserveCritical(Instruction * head){
 		}
 
 		previous = current;
-		current = current->next;
+		if (current != NULL){
+			current = current->next;
+		}
+		
 	}
 }
 
@@ -175,6 +181,12 @@ int main()
 	outputNum = getOutputInstructions(head);
 	for (i = 0; i < outputNum; i++){
 		Instruction * val = findStoreInstr(outputInstr[i]);
+		
+		if (val == NULL){
+			WARNING("No instructions\n");
+			exit(EXIT_FAILURE);
+		}		
+
 		getNextCritical(val->prev, val->field1);
 	}
 	
@@ -184,10 +196,17 @@ int main()
 	
 	free(outputInstr);
 		
-
+	Instruction * previous = head;
 
 	if (head) 
 		PrintInstructionList(stdout, head);
+
+	Instruction * current = head->next;
+	while (current != NULL){
+		free(previous);
+		previous = current;
+		current = current->next;
+	}
 	
 	return EXIT_SUCCESS;
 }
